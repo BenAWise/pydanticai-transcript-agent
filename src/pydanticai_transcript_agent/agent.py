@@ -2,13 +2,24 @@ from pydantic_ai import Agent
 from pydantic_ai.models.anthropic import AnthropicModel
 from typing import List
 import json
+import os
+from dotenv import load_dotenv
 from .models import Transcript, IdeaItem
+
+# Load environment variables
+load_dotenv()
 
 class TranscriptAgent:
     """Agent for analyzing transcripts and extracting LinkedIn post ideas."""
     
     def __init__(self):
-        self.model = AnthropicModel(model_name="claude-3-5-sonnet-latest")
+        if not os.getenv("ANTHROPIC_API_KEY"):
+            raise ValueError("ANTHROPIC_API_KEY environment variable is not set")
+            
+        self.model = AnthropicModel(
+            model_name="claude-3-5-sonnet-latest",
+            api_key=os.getenv("ANTHROPIC_API_KEY")
+        )
         self.agent = Agent(
             model=self.model,
             system_prompt="""You are an expert at analyzing transcripts and identifying potential LinkedIn post ideas.
